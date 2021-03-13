@@ -1,3 +1,4 @@
+/*
 package com.sundogsoftware.spark
 
 import org.apache.log4j._
@@ -49,4 +50,47 @@ object FriendsByAgeDataset {
       .alias("friends_avg")).sort("age").show()
   }
 }
-  
+  */
+
+package com.sundogsoftware.spark
+
+import org.apache.spark.sql._
+import org.apache.log4j._
+
+object FriendsByAgeDataSet {
+  case class Person(id: Int, name: String, age: Int, friends: Int)
+
+  def main(args: Array[String]): Unit ={
+    Logger.getLogger("org").setLevel(Level.ERROR)
+
+    val spark = SparkSession
+      .builder()
+      .appName("FriendsByAgeDataSet")
+      .master("local[*]")
+      .getOrCreate()
+
+    import spark.implicits._
+
+    val schemaPeople = spark.read
+      .option("header", "true")
+      .option("inferSchema", "true")
+      .csv("data/fakefriends.csv")
+      .as[Person]
+
+    schemaPeople.printSchema()
+
+    // schemaPeople.createOrReplaceTempView("people")
+
+    val friendsNum = schemaPeople
+      .select("age", "friends")
+      .groupBy("age")
+      .mean("friends")
+      .orderBy("age")
+
+    val results = friendsNum.collect()
+
+    results.foreach(println)
+
+    spark.stop()
+  }
+}

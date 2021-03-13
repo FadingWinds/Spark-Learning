@@ -37,7 +37,7 @@
    // Booleans
    val isGreater = 1 > 2
    val isLesser = 1 < 2
-   val impossible = isGreater & isLesser
+   val impossible = isGreater && isLesser
    val anotherWay = isGreater || isLesser
 
    val picard: String = "Picard"
